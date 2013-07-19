@@ -144,23 +144,33 @@ module.exports = (robot) ->
   # Robot add issue to "<project>" [traker <id>] with "<subject>"
   robot.respond /add (?:issue )?(?:\s*to\s*)?(?:"?([^" ]+)"? )(?:tracker\s)?(\d+)?(?:\s*with\s*)("?([^"]+)"?)/i, (msg) ->
     [project_id, tracker_id, subject] = msg.match[1..3]
+    firstName = msg.message.user.name.split(/\s/)[0]
 
-    attributes =
-      "project_id": "#{project_id}"
-      "subject": "#{subject}"
+    redmine.Users name:firstName, (err,data) ->
+      unless data.total_count > 0
+        msg.reply "Couldn't find any users with the name \"#{firstName}\""
+        return false
 
-    if tracker_id?
+      user = resolveUsers(firstName, data.users)[0]
+
       attributes =
         "project_id": "#{project_id}"
         "subject": "#{subject}"
-        "tracker_id": "#{tracker_id}"
+        "assigned_to_id": user.id
 
-    redmine.Issue().add attributes, (err, data, status) ->
-      unless data?
-        if status == 404
-          msg.reply "Couldn't update this issue, #{status} :("
-      else
-        msg.reply "Done! Added issue #{data.id} with \"#{subject}\""
+      if tracker_id?
+        attributes =
+          "project_id": "#{project_id}"
+          "subject": "#{subject}"
+          "tracker_id": "#{tracker_id}"
+          "assigned_to_id": user.id
+
+      redmine.Issue().add attributes, (err, data, status) ->
+        unless data?
+          if status == 404
+            msg.reply "Couldn't update this issue, #{status} :("
+        else
+          msg.reply "Done! Added issue #{data.id} with \"#{subject}\""
 
   # Robot assign <issue> to <user> ["note to add with the assignment]
   robot.respond /assign (?:issue )?(?:#)?(\d+) to (\w+)(?: "?([^"]+)"?)?/i, (msg) ->
