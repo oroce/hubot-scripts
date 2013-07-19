@@ -67,7 +67,7 @@ module.exports = (robot) ->
   # Robot add <hours> hours to <issue_id> ["comments for the time tracking"]
   robot.respond /add (\d{1,2}.?\d*?) hours? to (?:issue )?(?:#)?(\d+)(?: "?([^"]+)"?)?/i, (msg) ->
     [hours, id, userComments] = msg.match[1..3]
-    hours = parseInt hours
+    hours = parseFloat hours
 
     if userComments?
       comments = "#{msg.message.user.name}: #{userComments}"
