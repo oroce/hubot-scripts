@@ -65,7 +65,7 @@ module.exports = (robot) ->
         msg.reply "Update failed! (#{err})"
 
   # Robot add <hours> hours to <issue_id> ["comments for the time tracking"]
-  robot.respond /add (\d{1,2}) hours? to (?:issue )?(?:#)?(\d+)(?: "?([^"]+)"?)?/i, (msg) ->
+  robot.respond /add (\d{1,2}.?\d*?) hours? to (?:issue )?(?:#)?(\d+)(?: "?([^"]+)"?)?/i, (msg) ->
     [hours, id, userComments] = msg.match[1..3]
     hours = parseInt hours
 
