@@ -243,7 +243,7 @@ module.exports = (robot) ->
       notes: "#{note}"
 
     redmine.Issue(id).close attributes, (err, data, status)->
-      if status === 201
+      if status is 201
         msg.reply "Issue ##{id} has been closed"
       else
         msg.reply "Error occured during closing issue ##{id}"
