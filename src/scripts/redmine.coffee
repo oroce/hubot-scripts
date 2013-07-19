@@ -366,7 +366,7 @@ class Redmine
     add: (attributes, callback) =>
       @post "/issues.json", {issue: attributes}, callback
 
-    close: ( status, callback ) =>
+    close: (attributes, callback ) =>
       @put "/issues/#{id}.json", { issue: attributes }, callback
   TimeEntry: (id = null) ->
 
