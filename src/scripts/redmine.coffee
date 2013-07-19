@@ -20,6 +20,7 @@
 #   hubot add <hours> hours to <issue-id> ["comments"] - Adds hours to the issue with the optional comments
 #   hubot link me <issue-id> - Returns a link to the redmine issue
 #   hubot set <issue-id> to <int>% ["comments"] - Updates an issue and sets the percent done
+#   hubot close <issue-id> with "<note>" - closes an issue with note
 #
 # Notes:
 #   <issue-id> can be formatted in the following ways: 1234, #1234,
@@ -234,6 +235,19 @@ module.exports = (robot) ->
 
       msg.reply _.join "\n"
 
+  # Robot close <issue> with [notes]
+  robot.respond /update (?:issue )?(?:#)?(\d+)(?:\s*with\s*)?(?:[-:,])? (?:"?([^"]+)"?)/i, (msg) ->
+    [id, note] = msg.match[1..2]
+    attributes =
+      status_id: 5
+      notes: "#{note}"
+
+    redmine.Issue(id).close attributes, (err, data, status)->
+      if status === 201
+        msg.reply "Issue ##{id} has been closed"
+      else
+        msg.reply "Error occured during closing issue ##{id}"
+
   # Listens to #NNNN and gives ticket info
   robot.hear /.*(#(\d+)).*/, (msg) ->
     id = msg.match[1].replace /#/, ""
@@ -258,7 +272,6 @@ module.exports = (robot) ->
       
       url = "#{redmine.url}/issues/#{id}"
       msg.send "#{issue.tracker.name} <a href=\"#{url}\">##{issue.id}</a> (#{issue.project.name}): #{issue.subject} (#{issue.status.name}) [#{issue.priority.name}]"
-
 # simple ghetto fab date formatter this should definitely be replaced, but didn't want to
 # introduce dependencies this early
 #
@@ -353,6 +366,8 @@ class Redmine
     add: (attributes, callback) =>
       @post "/issues.json", {issue: attributes}, callback
 
+    close: ( status, callback ) =>
+      @put "/issues/#{id}.json", { issue: attributes }, callback
   TimeEntry: (id = null) ->
 
     create: (attributes, callback) =>
