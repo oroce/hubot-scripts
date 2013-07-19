@@ -236,7 +236,7 @@ module.exports = (robot) ->
       msg.reply _.join "\n"
 
   # Robot close <issue> with [notes]
-  robot.respond /close (?:issue )?(?:#)?(\d+)(?:\s*with\s*)?(?:[-:,])? (?:"?([^"]+)"?)/i, (msg) ->
+  robot.respond /close (?:issue )?(?:#)?(\d+)(?:\s*with\s*)?(?:[-:,])?(?:"?([^"]+)"?)/i, (msg) ->
     [id, note] = msg.match[1..2]
     attributes =
       status_id: 5
